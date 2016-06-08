@@ -4,7 +4,7 @@ toolTip:"Material"
 (
 
 	try(closeRolloutFloater fAutoMaterial)catch()
-	global fAutoMaterial = newRolloutFloater "Auto Material" 260 380
+	local fAutoMaterial = newRolloutFloater "Auto Material" 260 380
 	global szVer = "1.0.1"
 
 	global szIDPath = ""
@@ -13,9 +13,10 @@ toolTip:"Material"
 	global listMat = #()
 	global goodChars = "1234567890"
 
-	global rAutoMaterialSettings
-	global rAutoMaterial
-	global rAbout
+	local fAutoMaterial
+	local rAutoMaterialSettings
+	local rAutoMaterial
+	local rAbout
 
 	fn isGoodChars s =
 	(
@@ -67,6 +68,7 @@ toolTip:"Material"
 		fn openList =
 		(
 			edtIDPath.text = szIDPath
+			lbxPreview.items  = #()
 			
 			if(szIDPath == "" or not doesFileExist szIDPath) do return messageBox ("File " + szIDPath + " not found!") title: "Warning!"
 			
