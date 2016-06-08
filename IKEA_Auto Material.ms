@@ -5,7 +5,7 @@ toolTip:"Material"
 
 	try(closeRolloutFloater fAutoMaterial)catch()
 	local fAutoMaterial = newRolloutFloater "Auto Material" 260 380
-	global szVer = "1.0.1"
+	global szVer = "1.0.2"
 
 	global szIDPath = ""
 	global szMatPath = @"\\visco.local\resource\ikea\MaterialsMAX2012\"
