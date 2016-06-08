@@ -4,8 +4,8 @@ toolTip:"Material"
 (
 
 	try(closeRolloutFloater fAutoMaterial)catch()
-	local fAutoMaterial = newRolloutFloater "Auto Material" 260 600
-	global szVer = "1.0.3"
+	local fAutoMaterial = newRolloutFloater "Auto Material" 260 520
+	global szVer = "1.0.4"
 	
 	global szMatPath = @"\\visco.local\resource\ikea\MaterialsMAX2012\"
 	global listMat = #()
@@ -111,17 +111,22 @@ toolTip:"Material"
 			
 			if(not q) do return false
 			
-			listMat[id] = undefined
-			
+			if(listMat[id] == undefined) then deleteItem listMat id else listMat[id] = undefined
+						
 			for i in listMat.count to 1 by -1 do 
 			(	
 				if(listMat[i] == undefined) then deleteItem listMat i else exit
 			)
-			
-			spnID.value = listMat.count + 1
-			
-			if(lbxPreview.items.count > 0) do lbxPreview.selection = 1
-			
+		
+			if(lbxPreview.items.count > 0 and lbxPreview.items[id] != undefined) then
+			(				
+				lbxPreview.selection = id			
+			)
+			else
+			(
+				spnID.value = listMat.count + 1
+			)
+				
 			previewMaterials()
 		)
 		
