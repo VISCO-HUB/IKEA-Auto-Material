@@ -4,12 +4,10 @@ toolTip:"Material"
 (
 
 	try(closeRolloutFloater fAutoMaterial)catch()
-	local fAutoMaterial = newRolloutFloater "Auto Material" 260 380
-	global szVer = "1.0.2"
-
-	global szIDPath = ""
+	local fAutoMaterial = newRolloutFloater "Auto Material" 260 520
+	global szVer = "1.0.4"
+	
 	global szMatPath = @"\\visco.local\resource\ikea\MaterialsMAX2012\"
-	global listID = #()
 	global listMat = #()
 	global goodChars = "1234567890"
 
@@ -37,15 +35,18 @@ toolTip:"Material"
 			default: getIniSetting f "SETTINGS" k
 		)
 	)
-
+	
 	rollout rAutoMaterial "Create Material" 
 	(	
 		group "Material List"
-		(
-			listbox lbxPreview height: 9
-			edittext edtIDPath "" height: 25 readOnly: true
-			button btnSelectIDPath "Open List ID's" across: 2
-			button btnUpdateList "Update List"
+		(			
+			listbox lbxPreview height: 20
+			spinner spnID "ID:" type: #integer align: #left range: [1, 100, 1] fieldWidth: 30 across: 3
+			button brnIncrement "+" align: #left offset:[-15, -2]
+			edittext edtMaterialName "Material:" fieldWidth: 85 align: #left offset: [-56, 0]
+			
+			button btnAddID "Add/Edit Material" across: 2 offset: [0, 5]
+			button btnDelID "Delete Material" offset: [0, 5]
 		)
 		
 		group "Create"
@@ -53,78 +54,110 @@ toolTip:"Material"
 			button btnCreatemMat "Create" width: 215 height: 35
 			checkbox cbxAutoAssing "Assign to model" checked: true
 		)
-			
-		fn checkErrorChars =
+		
+		fn previewMaterials =
 		(
-			szError = ""
-			for i in 1 to listID.count do
-			(
-				if(isGoodChars listID[i] == false or isGoodChars listMat[i] == false) do szError +=  listID[i] + "=" + listMat[i] + "\n"
-			)
-			
-			return szError
+			lbxPreview.items = for i in 1 to listMat.count collect (i as string + ": ") + (if(listMat[i] == undefined) then "" else listMat[i])
 		)
 		
-		fn openList =
+		fn parseItem i =
 		(
-			edtIDPath.text = szIDPath
-			lbxPreview.items  = #()
+			s = filterString i ":"
 			
-			if(szIDPath == "" or not doesFileExist szIDPath) do return messageBox ("File " + szIDPath + " not found!") title: "Warning!"
+			if(s[2] != undefined) do return s[2]
+			if(s[1] != undefined) do return s[1]
+			return ""
+		)
+		
+		on btnAddID pressed do
+		(
+			m = edtMaterialName.text
+			id = spnID.value
+				
+			setFocus rAutoMaterial.edtMaterialName
 			
-			useSettings "ID_PATH" szIDPath type:#set
-					
-			listID = getIniSetting szIDPath "IKEA"		
+			if(m == "" or isGoodChars m == false) do 
+			(
+				edtMaterialName.text = ""
+				
+				return messageBox "Please enter correct Material Name!" title: "Warning!"
+			)
 			
-			if(listID.count == 0) do return messageBox "You selected wrong Materials ID file!" title: "Warning!"
+			if(listMat[id] != undefined) do 
+			(
+				q = queryBox ("Do you really want to replace item: " + lbxPreview.items[id] + " to " + m)
+				
+				if(not q) do return false
+			)
 			
-			listMat = for i in listID collect getIniSetting szIDPath "IKEA" i
+			listMat[id] = m
 			
-			showError = checkErrorChars()
-			if(showError != "") do return messageBox ("Please check next lines for errors:\n\n" + showError) title: "Warning"
+			previewMaterials()
 			
-			lbxPreview.items = for i in 1 to listID.count collect (listID[i] + ": " + listMat[i])
+			edtMaterialName.text = ""
+			
+			spnID.value += 1
+			
+			setFocus rAutoMaterial.edtMaterialName
+		)
+		
+		on btnDelID pressed do
+		(
+			id = lbxPreview.selection
+								
+			if(id == 0) do return false
+			
+			q =  queryBox ("Do you really want to delete item: " + lbxPreview.items[id] + " ?")
+			
+			if(not q) do return false
+			
+			if(listMat[id] == undefined) then deleteItem listMat id else listMat[id] = undefined
+						
+			for i in listMat.count to 1 by -1 do 
+			(	
+				if(listMat[i] == undefined) then deleteItem listMat i else exit
+			)
+		
+			if(lbxPreview.items.count > 0 and lbxPreview.items[id] != undefined) then
+			(				
+				lbxPreview.selection = id			
+			)
+			else
+			(
+				spnID.value = listMat.count + 1
+			)
+				
+			previewMaterials()
+		)
+		
+		on lbxPreview selected x do
+		(
+			spnID.value = x
+		)
+		
+		on brnIncrement pressed do
+		(
+			spnID.value += 1
 		)
 		
 		on cbxAutoAssing changed x do
 		(
 			useSettings "AUTO_ASSIGN" (x as string) type:#set
 		)
-		
-		on btnUpdateList pressed do
-		(
-			openList()
-		)
-		
+	
 		on rAutoMaterial open do
 		(
-			szIDPath = useSettings "ID_PATH" ""
-			
-			if(szIDPath != "") do openList()		
-
 			autoAssign = useSettings "AUTO_ASSIGN" ""
-			cbxAutoAssing.checked = if(autoAssign == "false" ) then false else true
-		)
-		
-		on btnSelectIDPath pressed do
-		(
-			f = getOpenFileName caption:"Open Materials ID" types: "INI(*.ini)|*.ini"
-			
-			if(f == undefined) do return false
-			szIDPath = f
-						
-			openList()
+			cbxAutoAssing.checked = if(autoAssign == "false" ) then false else true						
 		)
 		
 		fn matFile f = szMatPath + f + ".mat"
 		
 		on btnCreatemMat pressed do
-		(			
-			showError = checkErrorChars()
-			if(showError != "") do return messageBox ("Please check next lines for errors:\n\n" + showError) title: "Warning"		 
-			if(listID.count == 0 or listMat.count == 0) do return messageBox "ID's not found!" title: "Warning"
+		(						
+			if(listMat.count == 0) do return messageBox "Please add materials to list!" title: "Warning"
 			
-			errorMissingID = for i in 1 to listID.count where findItem listID (i as string) == 0 collect i as string
+			errorMissingID = for i in 1 to listMat.count where listMat[i] == undefined collect i as string
 			if(errorMissingID.count != 0) do
 			(
 				missingId = ""
@@ -133,10 +166,7 @@ toolTip:"Material"
 				
 				return messageBox ("Found missing ID's in list!\n\nFix next ID:" + missingId) title: "Warning!"
 			)
-			
-			errorOverflow = for i in listID where (i as integer) > 10 collect i
-			if(errorOverflow.count != 0) do return messageBox "Plese check your ID's list, you have ID greather then 10!" title: "Warning!"
-					
+								
 			errorBrokenMat = for i in 1 to listMat.count where (not doesFileExist (matFile listMat[i])) collect listMat[i] + ".mat"
 			
 			if(errorBrokenMat.count != 0) do 
@@ -147,17 +177,17 @@ toolTip:"Material"
 			)
 				
 			m = multiMaterial()
-			m.numsubs = listID.count
+			m.numsubs = listMat.count
 			m.name = "material"
 			
-			for i in 1 to listID.count do
+			for i in 1 to listMat.count do
 			(
 				t = loadTempMaterialLibrary (matFile listMat[i])
 				
-				id = listID[i] as integer
+				id = i as integer
 				
 				m[id] = t[1]
-				m[id].name = listMat[i]
+				m.names[id] = listMat[i]
 			)
 			
 			setMeditMaterial 1 m
@@ -215,4 +245,6 @@ toolTip:"Material"
 	addRollout rAutoMaterial fAutoMaterial rolledUp:false 
 	addRollout rAutoMaterialSettings fAutoMaterial rolledUp:true 
 	addRollout rAbout fAutoMaterial rolledUp:true 
+	
+	setFocus rAutoMaterial.edtMaterialName
 )
