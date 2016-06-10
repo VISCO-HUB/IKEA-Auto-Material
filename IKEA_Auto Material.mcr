@@ -5,7 +5,7 @@ toolTip:"Material"
 
 	try(closeRolloutFloater fAutoMaterial)catch()
 	local fAutoMaterial = newRolloutFloater "Auto Material" 260 545
-	global szVer = "1.0.5"
+	global szVer = "1.0.6"
 	
 	global szMatPath = @"\\visco.local\resource\ikea\MaterialsMAX2012\"
 	global listMat = #()
@@ -286,8 +286,8 @@ toolTip:"Material"
 				m.names[id] = listMat[i]
 			)
 			
-			setMeditMaterial 1 m
-			
+			setMeditMaterial activeMeditSlot  m
+						
 			if(cbxAutoAssing.checked) do
 			(
 				mdl = $model*
