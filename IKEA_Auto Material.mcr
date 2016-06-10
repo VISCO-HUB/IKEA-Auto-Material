@@ -5,7 +5,7 @@ NAME = Auto Material
 AUTHOR = MastaMan
 DEV = ViscoCG
 HELP = \help\
-CAT=ARCHVIZ
+CAT=IKEA
 LAUNCH=\\visco.local\data\Instal_Sync\scripts\scripts\_IKEA\IKEA Auto Material.ms
 
 [ABOUT]

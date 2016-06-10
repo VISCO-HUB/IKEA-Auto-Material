@@ -47,7 +47,7 @@ Added basic functionality=
 
 [ABOUT]
 
-Auto assign material from material library=
+Auto assign material from material library.=
 
 [SCRIPT]
 
