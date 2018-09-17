@@ -2,7 +2,7 @@
 [INFO]
 
 NAME = Auto Material
-VERSION = 1.0.6
+VERSION = 1.0.8
 AUTHOR = MastaMan
 DEV = ViscoCG
 HELP = \help\autoMaterial.html
@@ -45,6 +45,10 @@ Added basic functionality=
 [1.0.7]
 * Adopted for new Scripts Launcher=
 
+[1.0.8]
+* Changed: New material path=
+
+
 [ABOUT]
 
 Auto assign material from material library.=
@@ -55,9 +59,8 @@ Auto assign material from material library.=
 
 try(closeRolloutFloater fAutoMaterial)catch()
 global fAutoMaterial = newRolloutFloater "Auto Material" 260 545
-global szVer = "1.0.6"
 
-global szMatPath = @"\\visco.local\resource\ikea\MaterialsMAX2012\"
+global szMatPath = @"\\visco.local\data\lviv\IKEA\MaterialsMAX2012\"
 global listMat = #()
 global goodChars = "1234567890"
 
