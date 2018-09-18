@@ -60,7 +60,7 @@ Auto assign material from material library.=
 try(closeRolloutFloater fAutoMaterial)catch()
 global fAutoMaterial = newRolloutFloater "Auto Material" 260 545
 
-global szMatPath = @"\\visco.local\data\lviv\IKEA\MaterialsMAX2012\"
+global szMatPath = @"\\visco.local\data\lviv\IKEA\IKEAMaterials\"
 global listMat = #()
 global goodChars = "1234567890"
 
